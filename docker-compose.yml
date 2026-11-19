@@ -1,0 +1,29 @@
+# 5 nodos (cada uno con SU PROPIA base local en ./data/nodeN) + observador + 5 clientes.
+# Topología: TOPOLOGY=balanced|chain|star
+x-base: &base
+  build: .
+  environment:
+    LOG_DIR: /logs
+    DATA_DIR: /data
+    TOPOLOGY: ${TOPOLOGY:-balanced}
+    ACCESSES: ${ACCESSES:-10}        # 10 a 50 según el enunciado
+    SEED: ${SEED:-1}
+    THINK_MIN: ${THINK_MIN:-1}       # THINK_MIN=0 THINK_MAX=0 -> alta contención
+    THINK_MAX: ${THINK_MAX:-5}
+    CS_MIN: ${CS_MIN:-0.2}
+    CS_MAX: ${CS_MAX:-1.0}
+    NOSYNC: ${NOSYNC:-0}             # NOSYNC=1 -> corrida sin protocolo
+    START_DELAY: ${START_DELAY:-3}
+
+services:
+  observer: { <<: *base, command: python observer.py, volumes: ["./logs:/logs"] }
+  node1: { <<: *base, command: python node.py --id 1, volumes: ["./logs:/logs", "./data/node1:/data"] }
+  node2: { <<: *base, command: python node.py --id 2, volumes: ["./logs:/logs", "./data/node2:/data"] }
+  node3: { <<: *base, command: python node.py --id 3, volumes: ["./logs:/logs", "./data/node3:/data"] }
+  node4: { <<: *base, command: python node.py --id 4, volumes: ["./logs:/logs", "./data/node4:/data"] }
+  node5: { <<: *base, command: python node.py --id 5, volumes: ["./logs:/logs", "./data/node5:/data"] }
+  client1: { <<: *base, command: python client.py --id 1, volumes: ["./logs:/logs"] }
+  client2: { <<: *base, command: python client.py --id 2, volumes: ["./logs:/logs"] }
+  client3: { <<: *base, command: python client.py --id 3, volumes: ["./logs:/logs"] }
+  client4: { <<: *base, command: python client.py --id 4, volumes: ["./logs:/logs"] }
+  client5: { <<: *base, command: python client.py --id 5, volumes: ["./logs:/logs"] }
